@@ -1,0 +1,12 @@
+Flask
+llama-cpp-python
+numpy
+pyttsx3
+pytz
+requests
+scipy
+speechrecognition
+sympy
+# webrtcvad-wheels #sur windows
+webrtcvad
+whisper
