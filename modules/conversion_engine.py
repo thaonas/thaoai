@@ -84,8 +84,10 @@ conversions = {
 def traiter_conversion(message):
     try:
         message = message.lower().strip()
-        pattern = r"(\d+(?:\.\d+)?)\s*([a-z°]+)(?:\s+en|\s+to)\s*([a-z°]+)"
-        match = re.fullmatch(pattern, message)
+        message = message.replace("converti", "convertir").replace("mettre", "convertir")
+        
+        pattern = r"(?:convertir|conversion|calcule|donne|trouve|passer|changer|transforme)\s+(\d+(?:\.\d+)?)\s*([a-z°]+)(?:\s+en|\s+to)\s+([a-z°]+)"
+        match = re.fullmatch(pattern, message, re.IGNORECASE)
 
         if not match:
             return None
@@ -99,7 +101,6 @@ def traiter_conversion(message):
         unite_ref_source, facteur_source = conversions[unite_source]
         unite_ref_cible, facteur_cible = conversions[unite_cible]
 
-        # ✅ Correction ici : pas d'utilisation de 'callable' dans isinstance
         if not isinstance(facteur_source, (int, float)) or not isinstance(facteur_cible, (int, float)):
             return None
 

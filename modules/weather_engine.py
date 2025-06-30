@@ -46,17 +46,18 @@ GEOCODE_URL = (
 )
 
 def chercher_coordonnees(ville):
-    """Utilise OpenStreetMap/Nominatim pour obtenir les coordonnées"""
     headers = {"User-Agent": "assistant_local_v1.0"}
     url = GEOCODE_URL.format(ville=ville)
     try:
-        response = requests.get(url, headers=headers)
+        response = requests.get(url, timeout=5)
         data = response.json()
-        if 
+        if data and len(data) > 0:
             return float(data[0]["lat"]), float(data[0]["lon"])
+        else:
+            return None, None
     except Exception as e:
         print(f"❌ Erreur lors de la recherche des coordonnées : {e}")
-    return None, None
+        return None, None
 
 
 def obtenir_meteo_actuelle(ville):
@@ -91,9 +92,10 @@ def obtenir_meteo_actuelle(ville):
 def traiter_meteo(message):
     message = message.lower().strip()
 
-    # Recherche une ville ou un lieu dans le message
-    pattern = r"(?:météo|temps|pluie|neige)\s+(?:à|de|pour|dans)?\s+([a-zàâäéèêëïîôöùûüç\s]+)"
+    # Motif élargi pour capturer plus de phrases
+    pattern = r"(?:météo|temps|pluie|neige|nuageux|beau\s+temps|soleil|orage)\s+(?:à|de|pour|dans)?\s*([a-zàâäéèêëïîôöùûüç\s]+)"
     match = re.search(pattern, message, re.IGNORECASE)
+
     if not match:
         return None
 
@@ -102,7 +104,7 @@ def traiter_meteo(message):
         return None
 
     data = obtenir_meteo_actuelle(ville)
-    if not 
+    if not data:
         return None
 
     return (

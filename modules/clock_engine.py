@@ -15,28 +15,25 @@ def trouver_fuseau(message):
 
 def obtenir_heure_actuelle(message):
     try:
-        message = message.lower()
-        if "heure" not in message and "date" not in message:
-            return None
+        message = message.lower().strip()
+        if "heure" in message or "heures" in message or "quelle" in message and ("heure" in message or "h" in message):
+            zone_name = trouver_fuseau(message)
+            try:
+                zone = timezone(zone_name) if zone_name else timezone("UTC")
+            except Exception:
+                zone = timezone("UTC")
 
-        zone_name = trouver_fuseau(message)
-        try:
-            zone = timezone(zone_name) if zone_name else timezone("UTC")
-        except Exception:
-            zone = timezone("UTC")
+            maintenant = datetime.now(pytz.utc).astimezone(zone)
 
-        maintenant = datetime.now(pytz.utc).astimezone(zone)
+            format_date = "%A %d %B %Y"
+            format_heure = "%H:%M:%S"
 
-        format_date = "%A %d %B %Y"
-        format_heure = "%H:%M:%S"
-
-        if "heure" in message and "date" in message:
-            return f"Aujourd'hui, il est {maintenant.strftime(format_heure)} et nous sommes le {maintenant.strftime(format_date)}."
-        elif "heure" in message:
-            return f"Il est {maintenant.strftime(format_heure)}."
-        elif "date" in message:
-            return f"Aujourd'hui, c'est le {maintenant.strftime(format_date)}."
-
+            if "date" in message and "heure" in message:
+                return f"Aujourd'hui, il est {maintenant.strftime(format_heure)} et nous sommes le {maintenant.strftime(format_date)}."
+            elif "heure" in message:
+                return f"Il est {maintenant.strftime(format_heure)}."
+            elif "date" in message:
+                return f"Aujourd'hui, c'est le {maintenant.strftime(format_date)}."
         return None
     except Exception as e:
         print(f"[ERREUR] clock_engine.obtenir_heure_actuelle : {e}")
